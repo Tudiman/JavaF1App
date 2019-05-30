@@ -22,7 +22,7 @@ public class DatabaseParser{
 
     public ArrayList<String> parseFileLineByLine(String path) {
 
-        BufferedReader reader;
+        BufferedReader reader = null;
         ArrayList<String> parsedDatabase = new ArrayList<>();
 
         try {
@@ -36,6 +36,13 @@ public class DatabaseParser{
             }
         } catch(IOException e) {
             System.out.println("File not found");
+        } finally {
+            if(reader != null)
+                try {
+                    reader.close();
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
         }
         return parsedDatabase;
     }
