@@ -1,5 +1,6 @@
 package F1BasePack;
 
+import F1BasePack.Utility.ConnectionManager;
 import F1BasePack.Utility.Consts;
 import F1BasePack.Utility.DatabaseParser;
 import F1BasePack.Utility.SaveManager;
@@ -69,14 +70,15 @@ public class ChampionshipHandler {
     public Championship newChampionship(int[] scoring){
 
         SaveManager saveManager = SaveManager.getReference();
-        DatabaseParser databaseParser = DatabaseParser.getReference();
 
         Championship championship;
 
         int where = getSaveSlot();
         saveManager.uploadOrigin(Consts.generalFilesPath, Consts.originalDatabaseFiles, where);
 
-        databaseParser.prepareDatabase("Save files/save_" + where, Consts.originalDatabaseFiles, Consts.originalDatabaseTypes);
+        ConnectionManager.getReference().createDatabase(where);
+
+        DatabaseParser.getReference().linkTables();
 
         ArrayList<Team> teams = Team.getCurrentList();
         ArrayList<Track> tracks = Track.getCurrentList();
@@ -95,6 +97,8 @@ public class ChampionshipHandler {
 
         championship.nextWeekend(true);
 
+        System.out.println(Driver.getCurrentList());
+
         return championship;
     }
 
@@ -105,10 +109,7 @@ public class ChampionshipHandler {
         boolean valid = checkSaveSlot(slot);
         if(valid) {
 
-            DatabaseParser databaseParser = DatabaseParser.getReference();
-
-            databaseParser.prepareDatabase("Save files/save_" + slot,
-                    Consts.originalDatabaseFiles, Consts.originalDatabaseTypes);
+            ConnectionManager.getReference().loadDatabase(slot);
             return saveManager.loadChampionship(slot);
         }
         throw new Exception("Championship not found");
@@ -120,6 +121,7 @@ public class ChampionshipHandler {
 
         boolean valid = checkSaveSlot(slot);
         if(valid) {
+            ConnectionManager.getReference().dropDatabase(slot);
             saveManager.deleteChampionship(slot);
         }
         else throw new Exception("Not a valid slot");

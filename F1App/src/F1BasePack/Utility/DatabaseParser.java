@@ -66,7 +66,7 @@ public class DatabaseParser{
         TimestampService.getReference().postTimestamp("Database loader loaded the dynamic " + type + " database");
 
         if(type.equalsIgnoreCase("country")) {
-            ArrayList<Country> objects = new ArrayList<Country>();
+            ArrayList<Country> objects = new ArrayList<>();
             for(String line: formattedLines)
                 objects.add(Country.parseLine(line));
             return objects;
